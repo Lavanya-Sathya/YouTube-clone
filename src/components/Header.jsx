@@ -1,18 +1,43 @@
-import React from "react";
-import {
-  FaBars,
-  FaSearch,
-  FaUser,
-  FaUserCircle,
-  FaYoutube,
-} from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { FaBars, FaSearch, FaUserCircle, FaYoutube } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
+import { YOUTUBE_SUGGESTION_API } from "../utils/Constant";
 
 const Header = () => {
   const dispatch = useDispatch();
+  // toggle menu
   const handleMenu = () => {
     dispatch(toggleMenu());
+  };
+
+  // usestate for seach results
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestion] = useState(false);
+
+  // fetch cached search from redux store
+  const cacheSearch = useSelector((store) => store.search);
+
+  // search suggestions
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (cacheSearch[search]) {
+        setSuggestions(cacheSearch[search]);
+      } else {
+        getSearchSuggestion();
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // function to get the search suggestions
+  const getSearchSuggestion = async () => {
+    const data = await fetch(YOUTUBE_SUGGESTION_API + search);
+    const jsonData = await data.json();
+    setSuggestions(jsonData[1]);
+    // cache the suggestions in redux store
+    dispatch(cacheSearch({ [search]: jsonData[1] }));
   };
   return (
     <div className="fixed w-full bg-white px-2 py-4 flex justify-between items-center z-20">
@@ -23,15 +48,33 @@ const Header = () => {
           <span>YouTube</span>
         </div>
       </div>
-      <div className="flex items-center ">
-        <input
-          type="text"
-          placeholder="Search"
-          className="border-2 w-[22rem]  p-2 pl-4 border-gray-600 focus:outline-none rounded-l-full"
-        />
-        <div className="p-2 px-4 border-2 border-l-0 border-gray-600 text-gray-500  rounded-r-full">
-          <FaSearch size={24} />
+      <div>
+        <div className="flex items-center ">
+          <input
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => setShowSuggestion(true)}
+            onBlur={() => setShowSuggestion(false)}
+            className="border-2 w-[22rem]  p-2 pl-4 border-gray-600 focus:outline-none rounded-l-full"
+          />
+          <div className="p-2 px-4 border-2 border-l-0 border-gray-600 text-gray-500  rounded-r-full">
+            <FaSearch size={24} />
+          </div>
         </div>
+        {showSuggestions && suggestions.length > 0 && (
+          <ul className="absolute bg-white rounded-xl shadow-xl w-[22rem] px-2 py-4">
+            {suggestions?.map((item, idx) => (
+              <li
+                key={idx}
+                className="py-2 px-3 cursor-pointer rounded-lg hover:bg-slate-50"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="pr-4">
         <FaUserCircle size={24} />

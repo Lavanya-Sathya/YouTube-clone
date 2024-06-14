@@ -7,24 +7,24 @@ const Sidebar = () => {
   const isMenuOpen = useSelector((store) => store.app.isMenuOpen);
   if (!isMenuOpen) return null;
   return (
-    <div className="fixed left-0 w-[180px] px-2 shadow-xl bg-white min-h-full top-16">
+    <div className="z-20 fixed left-0 w-[180px] px-2 shadow-xl bg-white min-h-full top-16">
       <ul className="px-1 py-2 flex flex-col justify-center text-lg border-b-2">
         <li className="p-1">
           <Link to="/" className="flex items-center gap-2">
             <FaHouse />
-            <span>Home</span>{" "}
+            <span>Home</span>
           </Link>
         </li>
         <li className="p-1">
           <Link to="/" className="flex items-center gap-2">
             <FaStream />
-            <span>Shorts</span>{" "}
+            <span>Shorts</span>
           </Link>
         </li>
         <li className="p-1">
           <Link to="/" className="flex items-center gap-2">
             <FaVideo />
-            <span>Subscription</span>{" "}
+            <span>Subscription</span>
           </Link>
         </li>
       </ul>
@@ -32,25 +32,25 @@ const Sidebar = () => {
         <li className="p-1">
           <Link to="/" className="flex items-center gap-2">
             <FaHouse />
-            <span>Library</span>{" "}
+            <span>Library</span>
           </Link>
         </li>
         <li className="p-1">
           <Link to="/" className="flex items-center gap-2">
             <FaStream />
-            <span>History</span>{" "}
+            <span>History</span>
           </Link>
         </li>
         <li className="p-1">
           <Link to="/" className="flex items-center gap-2">
             <FaVideo />
-            <span>Your Videos</span>{" "}
+            <span>Your Videos</span>
           </Link>
-        </li>{" "}
+        </li>
         <li className="p-1">
           <Link to="/" className="flex items-center gap-2">
             <FaVideo />
-            <span>Watch Later</span>{" "}
+            <span>Watch Later</span>
           </Link>
         </li>
       </ul>
