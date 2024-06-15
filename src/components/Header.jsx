@@ -3,6 +3,11 @@ import { FaBars, FaSearch, FaUserCircle, FaYoutube } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
 import { YOUTUBE_SUGGESTION_API } from "../utils/Constant";
+import {
+  cacheResult,
+  setIsSearchTrue,
+  setSearchQuery,
+} from "../utils/searchSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -17,8 +22,12 @@ const Header = () => {
   const [showSuggestions, setShowSuggestion] = useState(false);
 
   // fetch cached search from redux store
-  const cacheSearch = useSelector((store) => store.search);
+  const cacheSearch = useSelector((store) => store.search.cacheSearch);
+  const searchQuery = useSelector((store) => store.search.searchQuery);
 
+  useEffect(()=>{
+    setSearch(searchQuery);
+  },[searchQuery])
   // search suggestions
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -37,7 +46,7 @@ const Header = () => {
     const jsonData = await data.json();
     setSuggestions(jsonData[1]);
     // cache the suggestions in redux store
-    dispatch(cacheSearch({ [search]: jsonData[1] }));
+    dispatch(cacheResult({ [search]: jsonData[1] }));
   };
   return (
     <div className="fixed w-full bg-white px-2 py-4 flex justify-between items-center z-20">
@@ -56,11 +65,19 @@ const Header = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onFocus={() => setShowSuggestion(true)}
-            onBlur={() => setShowSuggestion(false)}
+            // onBlur={() => setShowSuggestion(false)}
             className="border-2 w-[22rem]  p-2 pl-4 border-gray-600 focus:outline-none rounded-l-full"
           />
           <div className="p-2 px-4 border-2 border-l-0 border-gray-600 text-gray-500  rounded-r-full">
-            <FaSearch size={24} />
+            <FaSearch
+              size={24}
+              className="hover:scale-125 cursor-pointer"
+              onClick={() => {
+                dispatch(setIsSearchTrue());
+                dispatch(setSearchQuery(search));
+                setShowSuggestion(false);
+              }}
+            />
           </div>
         </div>
         {showSuggestions && suggestions.length > 0 && (
@@ -69,6 +86,11 @@ const Header = () => {
               <li
                 key={idx}
                 className="py-2 px-3 cursor-pointer rounded-lg hover:bg-slate-50"
+                onClick={() => {
+                  setSearch(item);
+                  setShowSuggestion(false);
+                }}
+                onBlur={() => setShowSuggestion(false)}
               >
                 {item}
               </li>
